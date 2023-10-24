@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Sample</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, #00bfff, #87ceeb, #1e90ff);
+            background-size: 600% 100%;
+            animation: gradientBackground 4s linear infinite;
+            padding-top: 20px;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #228B22; /* Màu xanh lá đậm */
+            transform: scale(1.1); /* Hiệu ứng nổi */
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+
+        .form-container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+        }
+
+        button[type="submit"] {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f5f5f5; /* Màu nền */
+            color: #333; /* Màu văn bản */
+        }
+
+        select:hover {
+            background-color: #eee; /* Màu nền khi di chuột vào */
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="#">Trang chủ</a>
+    <a href="#">Danh mục 1</a>
+    <a href="#">Danh mục 2</a>
+    <a href="#">Danh mục 3</a>
+    <a href="#">Liên hệ</a>
+</div>
+<div class="content">
+    <h1>Add Sample</h1>
+    <form th:action="@{/sample/save}" method="post" enctype="multipart/form-data" th:object="${labels}">
+        <div class="form-group">
+            <label for="file">Choose Image:</label>
+            <input type="file" class="form-control-file" id="file" name="file">
+            <img id="selectedImage" src="#" alt="Ảnh đã chọn" style="max-width: 25%; display: none;">
+        </div>
+
+        <div class="form-group">
+            <label for="labelId">Label:</label>
+            <select class="form-control" id="labelId" name="labelId">
+                <option value="">Choose A Label</option>
+                <option th:each="label : ${labels}" th:value="${label.id}" th:text="${label.name}"></option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+
+<script>
+    const fileInput = document.getElementById("file");
+    const selectedImage = document.getElementById("selectedImage");
+
+    fileInput.addEventListener("change", function () {
+        const selectedFile = fileInput.files[0];
+        if (selectedFile) {
+            selectedImage.style.display = "block";
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                selectedImage.src = e.target.result;
+            };
+            reader.readAsDataURL(selectedFile);
+        } else {
+            selectedImage.style.display = "none";
+            selectedImage.src = "";
+        }
+    });
+</script>
+</body>
+</html>

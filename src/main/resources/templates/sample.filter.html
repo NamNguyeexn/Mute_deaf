@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Filter</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .image-card img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+        }
+        .btn {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Sample Filter</h1>
+<!--    <form th:action="@{/sample/filter/}"  method="post">-->
+<!--        <div class="form-group">-->
+<!--            <label for="username">Username</label>-->
+<!--            <input type="text" id="username" th:field="*{username}" class="form-control" required>-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="password">Password</label>-->
+<!--            <input type="password" id="password" th:field="*{password}" class="form-control" required>-->
+<!--        </div>-->
+<!--        <button type="submit" class="btn btn-primary btn-block">Login</button>-->
+<!--    </form>-->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Sample</th>
+            <th>Label</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sample: ${samples}">
+            <td th:text="${sample.id}">1</td>
+            <td class="image-card">
+                <img th:src="${sample.getLink()}" alt="Ảnh">
+            </td>
+            <td th:text="${sample.getName()}">Tên ảnh</td>
+            <td>
+                <!--                <a th:href="@{'/edit/' + ${item.id}}" class="btn btn-primary">Edit</a>-->
+                <!--                <a th:href="@{'/delete/' + ${item.id}}" class="btn btn-danger">Delete</a>-->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="btn-container">
+        <a th:href="@{/home}" class="btn btn-success">Back</a>
+        <a th:href="@{/sample/add}" class="btn btn-success">Add Sample</a>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

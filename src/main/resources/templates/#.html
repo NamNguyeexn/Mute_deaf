@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 100px;
+            text-align: center;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+        }
+        .btn {
+            margin: 10px;
+            font-size: 18px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Home</h2>
+    <div class="btn-container">
+        <a th:href="@{/sample/all}" class="btn btn-primary">Sample Home</a>
+        <a th:href="@{/model/all}" class="btn btn-secondary">Model Home</a>
+        <a th:href="@{/dataset/all}" class="btn btn-success">Dataset Home</a>
+        <a th:href="@{/logout}" class="btn btn-warning">Log Out</a>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
