@@ -44,7 +44,7 @@ public class LabelService implements LabelServiceImpl {
     }
 
     @Override
-    public String getLabelById(int id) {
+    public String getLabelNameById(int id) {
         return labelRepo.findById(id).get().getName();
     }
 

@@ -9,8 +9,7 @@ import java.util.Optional;
 public interface LabelServiceImpl {
     List<Label> getAll();
     Optional<Label> getLabelBySampleId(int id);
-
     List<Label> getListOfLabelBySampleId(List<Sample> sample);
-    String getLabelById(int id);
+    String getLabelNameById(int id);
     Label getLabelByName(String name);
 }

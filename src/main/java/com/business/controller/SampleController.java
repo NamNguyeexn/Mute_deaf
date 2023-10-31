@@ -1,13 +1,13 @@
 package com.business.controller;
 
 import com.business.beans.Label;
+import com.business.beans.Pkg.SampleLabel;
 import com.business.beans.Sample;
 import com.business.beans.User;
 import com.business.services.LabelServiceImpl;
 import com.business.services.SampleServiceImpl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +37,7 @@ public class SampleController {
     private SampleServiceImpl sampleService;
     @Autowired
     private LabelServiceImpl labelService;
+    private SampleLabel midSampleLabel;
     @GetMapping("/all")
     public String getAllSample(Model modelSol, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -72,7 +73,7 @@ public class SampleController {
         }
         sample.setId(lId + 1);
         sample.setLink(uploadImageFunc(file));
-        sample.setName(labelService.getLabelById(labelId));
+        sample.setName(labelService.getLabelNameById(labelId));
         LocalDate date = LocalDate.now();
         sample.setValidDate(Date.valueOf(date));
         sampleService.saveSample(sample);
@@ -88,27 +89,6 @@ public class SampleController {
         modelSol.addAttribute("samples", _sample);
         return "sample.filter";
     }
-//    @RequestMapping("/delete/confirm/{id}")
-//    public String confirmDeleteView(@PathVariable("id") int id, Model modelSol, HttpSession session) {
-//        User user = (User) session.getAttribute("user");
-//        if(user == null) {
-//            return "redirect:/login";
-//        }
-//        Sample sample = sampleService.getSampleById(id).get();
-//        modelSol.addAttribute("sample", sample);
-//        session.setAttribute("id", id);
-//        return "sample.delete.confirm";
-//    }
-    @RequestMapping("/delete/{id}")
-    public String deleteSample(@PathVariable("id") int id, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if(user == null) {
-            return "redirect:/login";
-        }
-        sampleService.deleteSample(id);
-        session.removeAttribute("id");
-        return "redirect:/sample/all";
-    }
     @RequestMapping("/edit/{id}")
     public String editSample(@PathVariable("id") int id, Model modelSol, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -116,20 +96,16 @@ public class SampleController {
             return "redirect:/login";
         }
         Sample sample =  sampleService.getSampleById(id).get();
-        modelSol.addAttribute("sample", sample);
-//        modelSol.addAttribute("sampleLink", sampleService.getSampleById(id).get().getLink());
-//        modelSol.addAttribute("sampleName", sampleService.getSampleById(id).get().getName());
-        modelSol.addAttribute("id", id);
-
+        SampleLabel sLabel = new SampleLabel(id, sample.getLink(), labelService.getLabelByName(sample.getName()).getId());
+        modelSol.addAttribute("samLabel", sLabel);
+        midSampleLabel = sLabel;
         modelSol.addAttribute("labels", labelService.getAll());
         return "sample.edit";
     }
-    @PostMapping("/saveE")
-    public String saveEdited(@RequestParam("id") int id,
-                        @RequestParam("sampleLink") String sampleLink,
-                        @RequestParam("sampleName") String sampleName,
-                        @RequestParam("labelId") int labelId,
-                       @RequestParam("file")MultipartFile file,
+    @RequestMapping("/update")
+    public String saveEdited(
+                        @ModelAttribute("samLabel") SampleLabel sampleLabel,
+                       @RequestParam("labelId") int labelId,
                        Model modelSol,
                        HttpSession session)
             throws IOException {
@@ -137,33 +113,59 @@ public class SampleController {
         if(user == null) {
             return "redirect:/login";
         }
-        Sample sample = sampleService.getSampleById(id).get();
-        if(file == null) sample.setLink(sampleLink);
-        else sample.setLink(uploadImageFunc(file));
-        sample.setName(sampleName);
+        if(labelId != midSampleLabel.getLabelId())
+            midSampleLabel.setLabelId(labelId);
+        Sample sample = new Sample();
+        sample.setId(midSampleLabel.getSampleId());
+        String label = labelService.getLabelNameById(midSampleLabel.getLabelId());
+        sample.setName(label);
+        sample.setLink(midSampleLabel.getLink());
         LocalDate date = LocalDate.now();
         sample.setValidDate(Date.valueOf(date));
         sampleService.saveSample(sample);
+        midSampleLabel = null;
         return "redirect:/sample/all";
+    }
+    @RequestMapping("/deleteConfirm/{id}")
+    public String deleteSampleForm(@PathVariable("id") int id, Model modelSol, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if(user == null) {
+            return "redirect:/login";
+        }
+        Sample sample =  sampleService.getSampleById(id).get();
+        SampleLabel sLabel = new SampleLabel(id, sample.getLink(), labelService.getLabelByName(sample.getName()).getId());
+        modelSol.addAttribute("samLabel", sLabel);
+        midSampleLabel = sLabel;
+        modelSol.addAttribute("labelName", labelService.getLabelNameById(midSampleLabel.getLabelId()));
+        return "sample.delete.confirm";
+    }
+    @RequestMapping("/delete")
+    public String deleteSample(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if(user == null) {
+            return "redirect:/login";
+        }
+        sampleService.deleteSample(midSampleLabel.getSampleId());
+        midSampleLabel = null;
+        return "redirect:/sample/all";
+    }
+    private static void checkLog(Object objectInput) {
+        System.out.print("\n");
+        for (int i = 0; i < 10; i++)
+            System.out.print("-");
+        System.out.print(" CHECK LOG ");
+        for (int i = 0; i < 10; i++)
+            System.out.print("-");
+        System.out.print("\n");
+        System.out.print(objectInput.toString());
+        for (int i = 0; i < 31; i++)
+            System.out.print("-");
+        System.out.print("\n");
     }
     private String uploadImageFunc(MultipartFile file) throws IOException {
         Cloudinary cloudinary = new Cloudinary("cloudinary://" + apiKey + ":" + apiSecret + "@" + cloudName);
         Map<String, String> uploadImage = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         String img = uploadImage.get("url");
         return img;
-    }
-    @PostMapping("/update")
-    public String updateSample(@ModelAttribute("sample") Sample sample, @ModelAttribute("label") Label label, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if(user == null) {
-            return "redirect:/login";
-        }
-        LocalDate date = LocalDate.now();
-        Optional<Sample> updateSample = sampleService.getSampleById(sample.getId());
-        updateSample.get().setName(label.getName());
-        updateSample.get().setLink(sample.getLink());
-        updateSample.get().setValidDate(Date.valueOf(date));
-        sampleService.saveSample(updateSample.get());
-        return "redirect:/sample/all";
     }
 }
