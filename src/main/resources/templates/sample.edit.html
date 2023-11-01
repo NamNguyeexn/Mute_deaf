@@ -107,8 +107,7 @@
 <div class="sidebar">
     <a href="/home">Home</a>
     <a href="/sample/all">Sample Home</a>
-    <a href="/model/all">Model Home</a>
-    <a href="/dataset/all">Dataset Home</a>
+    <a href="/modelml/all">Model Home</a>
     <a href="/logout">Log Out</a>
 </div>
 <div class="content">
@@ -129,7 +128,9 @@
         <input id="linkI" th:field="*{link}" th:value="${samLabel.getLink()}" hidden>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
-    <button th:action="@{/sample/all}" class="btn btn-primary" method="get">Cancel</button>
+    <form th:action="@{/sample/all}" method="get">
+        <button type="submit" class="btn btn-primary">Back</button>
+    </form>
 </div>
 </body>
 </html>

@@ -7,14 +7,19 @@ import com.business.repository.SampleRepo;
 import com.business.services.LabelServiceImpl;
 import com.business.services.SampleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.cloudinary.*;
 import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,7 +28,12 @@ public class SampleService implements SampleServiceImpl {
     private SampleRepo sampleRepo;
     @Autowired
     private LabelRepo labelRepo;
-
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
+    @Value("${cloudinary.api_key}")
+    private String apiKey;
+    @Value("${cloudinary.api_secret}")
+    private String apiSecret;
     @Override
     public List<Sample> getSampleInDate(Date d1, Date d2) {
         if (d1 == null && d2 != null) return getSampleAfterDay(d1);
@@ -74,6 +84,29 @@ public class SampleService implements SampleServiceImpl {
         sampleRepo.deleteById(id);
     }
 
+//    @Override
+//    public void addAllSample() throws IOException {
+////        String path = "D:\\Tai_lieu_ki_1_nam_4\\PT_HTTM\\Pkg\\Data\\images";
+////        File folder = new File(path);
+////        File[] files = folder.listFiles();
+////        for (File f : files) {
+////            String[] fNames = f.getName().split("||.");
+////            System.out.println(fNames[0]);
+////            Sample sample = new Sample();
+////            int lId = 0;
+////            for (var b : sampleRepo.findAll()) {
+////                if(lId < b.getId())
+////                    lId = b.getId();
+////            }
+////            sample.setId(lId + 1);
+////            sample.setLink(uploadImageFunc((MultipartFile) f));
+////            sample.setName();
+////            LocalDate date = LocalDate.now();
+////            sample.setValidDate(Date.valueOf(date));
+////            sampleService.saveSample(sample);
+//        }
+//    }
+
     private List<Sample> getSampleBeforeDay(Date d2) {
         List<Sample> res = new ArrayList<>();
         for (var b : sampleRepo.findAll()) {
@@ -103,5 +136,4 @@ public class SampleService implements SampleServiceImpl {
         }
         return res;
     }
-
 }

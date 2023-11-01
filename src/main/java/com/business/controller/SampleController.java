@@ -11,18 +11,21 @@ import com.cloudinary.utils.ObjectUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.io.File;
+import java.nio.file.Files;
 import java.sql.Date;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/sample")
@@ -39,13 +42,15 @@ public class SampleController {
     private LabelServiceImpl labelService;
     private SampleLabel midSampleLabel;
     @GetMapping("/all")
-    public String getAllSample(Model modelSol, HttpSession session) {
+    public String getAllSample(Model modelSol, HttpSession session) throws IOException {
         User user = (User) session.getAttribute("user");
         if(user == null) {
             return "redirect:/login";
         }
         List<Sample> _sample = sampleService.getAll();
         modelSol.addAttribute("samples", _sample);
+        modelSol.addAttribute("nums", _sample.size());
+//        checkLog(_sample.size());
         if (_sample.isEmpty()) return "redirect:/sample/add";
         else return "sample.all";
     }
@@ -106,7 +111,6 @@ public class SampleController {
     public String saveEdited(
                         @ModelAttribute("samLabel") SampleLabel sampleLabel,
                        @RequestParam("labelId") int labelId,
-                       Model modelSol,
                        HttpSession session)
             throws IOException {
         User user = (User) session.getAttribute("user");
@@ -167,5 +171,38 @@ public class SampleController {
         Map<String, String> uploadImage = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         String img = uploadImage.get("url");
         return img;
+    }
+    private void addAllSample() throws IOException {
+        String path = "D:\\Tai_lieu_ki_1_nam_4\\PT_HTTM\\Pkg\\Data\\images";
+        File folder = new File(path);
+        File[] files = folder.listFiles();
+        List<MultipartFile> mlFiles = new ArrayList<>();
+        for (File f : files) {
+
+            String name = f.getName();
+
+            byte[] bytes = Files.readAllBytes(f.toPath());
+
+            MultipartFile multipartFile = new MockMultipartFile(
+                    name,
+                    bytes
+            );
+            mlFiles.add(multipartFile);
+        }
+        for (var f : mlFiles){
+            String[] fname = f.getName().split("||.");
+            Sample sample = new Sample();
+            int lId = 0;
+            for (var b : sampleService.getAll()) {
+                if(lId < b.getId())
+                    lId = b.getId();
+            }
+            sample.setId(lId + 1);
+            sample.setLink(uploadImageFunc(f));
+            sample.setName(fname[0].toLowerCase(Locale.ROOT));
+            LocalDate date = LocalDate.now();
+            sample.setValidDate(Date.valueOf(date));
+            sampleService.saveSample(sample);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.business.services;
 
 import com.business.beans.Sample;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +16,5 @@ public interface SampleServiceImpl {
     List<Sample> getListSampleByLabelId(int id);
     List<Sample> getListSampleByName(String name);
     void deleteSample(int id);
+//    void addAllSample() throws IOException;
 }

@@ -6,7 +6,6 @@ public class SampleLabel {
     private int sampleId;
     private String link;
     private int labelId;
-
     public SampleLabel(){};
 
     public SampleLabel(int sampleId, String link, int labelId) {
